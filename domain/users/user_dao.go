@@ -3,12 +3,11 @@ package users
 import (
 	"fmt"
 
+	"github.com/migueloli/bookstore_users-api/utils/dateutils"
 	"github.com/migueloli/bookstore_users-api/utils/errors"
 )
 
-var (
-	usersDB = make(map[int64]*User)
-)
+var usersDB = make(map[int64]*User)
 
 // Get the user from the database or return a RestErr.
 func (user *User) Get() *errors.RestErr {
@@ -37,10 +36,13 @@ func (user *User) Save() *errors.RestErr {
 				fmt.Sprintf("Email %s already exists", user.Email),
 			)
 		}
+
 		return errors.NewBadRequestError(
 			fmt.Sprintf("User %d already exists", user.ID),
 		)
 	}
+
+	user.DateCreated = dateutils.GetNowString()
 
 	usersDB[user.ID] = user
 
