@@ -21,7 +21,9 @@ func CreateUser(c *gin.Context) {
 	result, saveErr := services.CreateUser(user)
 	if saveErr != nil {
 		c.JSON(saveErr.Status, saveErr)
+		return
 	}
+
 	c.JSON(http.StatusCreated, result)
 }
 

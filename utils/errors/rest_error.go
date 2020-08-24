@@ -17,3 +17,12 @@ func NewBadRequestError(message string) *RestErr {
 		Error:   "bar_request",
 	}
 }
+
+// NewNotFoundError is used to create a RestErr informing a NotFound and a message
+func NewNotFoundError(message string) *RestErr {
+	return &RestErr{
+		Message: message,
+		Status:  http.StatusNotFound,
+		Error:   "not_found",
+	}
+}
