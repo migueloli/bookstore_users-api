@@ -1,50 +1,56 @@
 package users
 
 import (
-	"fmt"
-
+	"github.com/migueloli/bookstore_users-api/datasources/mysql/usersdb"
 	"github.com/migueloli/bookstore_users-api/utils/dateutils"
 	"github.com/migueloli/bookstore_users-api/utils/errors"
+	"github.com/migueloli/bookstore_users-api/utils/mysqlutils"
 )
 
-var usersDB = make(map[int64]*User)
+const (
+	queryUserInsert = "INSERT INTO users(first_name, last_name, email, date_created) VALUES (?, ?, ?, ?);"
+	queryGetUser    = "SELECT id, first_name, last_name, email, date_created FROM users WHERE id = ?;"
+)
 
 // Get the user from the database or return a RestErr.
 func (user *User) Get() *errors.RestErr {
-	result := usersDB[user.ID]
-	if result == nil {
-		return errors.NewNotFoundError(
-			fmt.Sprintf("User %d not found.", user.ID),
-		)
+	stmt, err := usersdb.Client.Prepare(queryGetUser)
+	if err != nil {
+		return errors.NewInternalServerError(err.Error())
 	}
 
-	user.ID = result.ID
-	user.FirstName = result.FirstName
-	user.LastName = result.LastName
-	user.Email = result.Email
-	user.DateCreated = result.DateCreated
+	defer stmt.Close()
+
+	result := stmt.QueryRow(user.ID)
+	if getErr := result.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated); getErr != nil {
+		mysqlutils.ParseError(getErr)
+	}
 
 	return nil
 }
 
 // Save the user in the database or return the RestErr.
 func (user *User) Save() *errors.RestErr {
-	current := usersDB[user.ID]
-	if current != nil {
-		if user.Email == current.Email {
-			return errors.NewBadRequestError(
-				fmt.Sprintf("Email %s already exists", user.Email),
-			)
-		}
-
-		return errors.NewBadRequestError(
-			fmt.Sprintf("User %d already exists", user.ID),
-		)
+	stmt, err := usersdb.Client.Prepare(queryUserInsert)
+	if err != nil {
+		return errors.NewInternalServerError(err.Error())
 	}
+
+	defer stmt.Close()
 
 	user.DateCreated = dateutils.GetNowString()
 
-	usersDB[user.ID] = user
+	insertResult, saveErr := stmt.Exec(user.FirstName, user.LastName, user.Email, user.DateCreated)
+	if saveErr != nil {
+		return mysqlutils.ParseError(saveErr)
+	}
+
+	userID, err := insertResult.LastInsertId()
+	if err != nil {
+		mysqlutils.ParseError(err)
+	}
+
+	user.ID = userID
 
 	return nil
 }

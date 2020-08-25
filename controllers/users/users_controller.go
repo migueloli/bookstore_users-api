@@ -30,14 +30,14 @@ func CreateUser(c *gin.Context) {
 
 // GetUser is the entry point for getting the user by id.
 func GetUser(c *gin.Context) {
-	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	userID, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if userErr != nil {
 		err := errors.NewBadRequestError("User ID should be a number.")
 		c.JSON(err.Status, err)
 		return
 	}
 
-	user, getErr := services.GetUser()
+	user, getErr := services.GetUser(userID)
 	if getErr != nil {
 		c.JSON(getErr.Status, getErr)
 		return

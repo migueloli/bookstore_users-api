@@ -20,9 +20,9 @@ func CreateUser(user users.User) (*users.User, *errors.RestErr) {
 
 // GetUser is a service to handle the user recover
 func GetUser(userID int64) (*users.User, *errors.RestErr) {
-	// if userId <= 0 {
-	// 	return nil, errors.NewBadRequest("User ID has to be greater than 0.")
-	// }
+	if userID <= 0 {
+		return nil, errors.NewBadRequestError("User ID has to be greater than 0.")
+	}
 
 	result := &users.User{ID: userID}
 	if err := result.Get(); err != nil {
