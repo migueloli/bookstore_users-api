@@ -65,3 +65,13 @@ func UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestErr) 
 
 	return &user, nil
 }
+
+// DeleteUser is a service to handle the user recover
+func DeleteUser(userID int64) *errors.RestErr {
+	if userID <= 0 {
+		return errors.NewBadRequestError("User ID has to be greater than 0.")
+	}
+
+	user := &users.User{ID: userID}
+	return user.Delete()
+}
