@@ -6,6 +6,11 @@ import (
 	"github.com/migueloli/bookstore_users-api/utils/errors"
 )
 
+const (
+	// StatusActive is the constant to inform the user status as active
+	StatusActive = "active"
+)
+
 // User is the base of this domain
 type User struct {
 	ID          int64  `json:"id"`
@@ -13,6 +18,8 @@ type User struct {
 	LastName    string `json:"last_name"`
 	Email       string `json:"email"`
 	DateCreated string `json:"date_created"`
+	Status      string `json:"status"`
+	Password    string `json:"-"`
 }
 
 // Validate is used to verify if the user struct has the obligated fields
@@ -25,5 +32,11 @@ func (user *User) Validate() *errors.RestErr {
 	if user.Email == "" {
 		return errors.NewBadRequestError("Invalid e-mail address.")
 	}
+
+	user.Password = strings.TrimSpace(user.Email)
+	if user.Password == "" {
+		return errors.NewBadRequestError("Invalid password.")
+	}
+
 	return nil
 }

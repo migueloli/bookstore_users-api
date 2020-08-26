@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/migueloli/bookstore_users-api/domain/users"
+	"github.com/migueloli/bookstore_users-api/utils/dateutils"
 	"github.com/migueloli/bookstore_users-api/utils/errors"
 )
 
@@ -11,6 +12,8 @@ func CreateUser(user users.User) (*users.User, *errors.RestErr) {
 		return nil, err
 	}
 
+	user.Status = users.StatusActive
+	user.DateCreated = dateutils.GetNowDBString()
 	if err := user.Save(); err != nil {
 		return nil, err
 	}
@@ -74,4 +77,10 @@ func DeleteUser(userID int64) *errors.RestErr {
 
 	user := &users.User{ID: userID}
 	return user.Delete()
+}
+
+// SearchUser is a service to handle the user recover using params
+func SearchUser(status string) ([]users.User, *errors.RestErr) {
+	dao := &users.User{}
+	return dao.FindByStatus(status)
 }

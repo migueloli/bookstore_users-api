@@ -90,14 +90,23 @@ func Delete(c *gin.Context) {
 		return
 	}
 
-	user := users.User{}
-
-	user.ID = userID
-
-	if err := services.DeleteUser(user); err != nil {
+	if err := services.DeleteUser(userID); err != nil {
 		c.JSON(err.Status, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]string{"status": "Deleted successfully."})
+}
+
+// Search is the entry point for searching a list of users by params.
+func Search(c *gin.Context) {
+	status := c.Query("status")
+
+	users, err := services.SearchUser(status)
+	if err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
 }
