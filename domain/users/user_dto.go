@@ -18,6 +18,9 @@ type User struct {
 // Validate is used to verify if the user struct has the obligated fields
 // are correctly fulfilled
 func (user *User) Validate() *errors.RestErr {
+	user.FirstName = strings.TrimSpace(strings.ToLower(user.FirstName))
+	user.LastName = strings.TrimSpace(strings.ToLower(user.LastName))
+
 	user.Email = strings.TrimSpace(strings.ToLower(user.Email))
 	if user.Email == "" {
 		return errors.NewBadRequestError("Invalid e-mail address.")
