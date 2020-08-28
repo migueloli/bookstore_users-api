@@ -19,8 +19,11 @@ type User struct {
 	Email       string `json:"email"`
 	DateCreated string `json:"date_created"`
 	Status      string `json:"status"`
-	Password    string `json:"-"`
+	Password    string `json:"password"`
 }
+
+// Users is a slice of user.
+type Users []User
 
 // Validate is used to verify if the user struct has the obligated fields
 // are correctly fulfilled
