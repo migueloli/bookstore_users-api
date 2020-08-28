@@ -1,6 +1,8 @@
 package errors
 
-import "net/http"
+import (
+	"net/http"
+)
 
 // RestErr is the base structure for error responses
 type RestErr struct {
