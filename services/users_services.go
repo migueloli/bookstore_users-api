@@ -20,6 +20,7 @@ type usersServiceInterface interface {
 	UpdateUser(bool, users.User) (*users.User, *errors.RestErr)
 	DeleteUser(int64) *errors.RestErr
 	SearchUser(string) (users.Users, *errors.RestErr)
+	LoginUser(users.UserLoginRequest) (*users.User, *errors.RestErr)
 }
 
 // CreateUser is a service to handle the user creation
@@ -100,4 +101,16 @@ func (s *usersService) DeleteUser(userID int64) *errors.RestErr {
 func (s *usersService) SearchUser(status string) (users.Users, *errors.RestErr) {
 	dao := &users.User{}
 	return dao.FindByStatus(status)
+}
+
+// LoginUser is a service to handle the user login
+func (s *usersService) LoginUser(request users.UserLoginRequest) (*users.User, *errors.RestErr) {
+	dao := &users.User{
+		Email:    request.Email,
+		Password: cryptoutils.GetMd5(request.Password),
+	}
+	if err := dao.FindByEmailPassword(); err != nil {
+		return nil, err
+	}
+	return dao, nil
 }
