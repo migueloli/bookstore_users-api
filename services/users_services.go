@@ -4,7 +4,7 @@ import (
 	"github.com/migueloli/bookstore_users-api/domain/users"
 	"github.com/migueloli/bookstore_users-api/utils/cryptoutils"
 	"github.com/migueloli/bookstore_users-api/utils/dateutils"
-	"github.com/migueloli/bookstore_users-api/utils/errors"
+	"github.com/migueloli/bookstore_utils-go/resterrors"
 )
 
 var (
@@ -15,16 +15,16 @@ var (
 type usersService struct{}
 
 type usersServiceInterface interface {
-	CreateUser(users.User) (*users.User, *errors.RestErr)
-	GetUser(int64) (*users.User, *errors.RestErr)
-	UpdateUser(bool, users.User) (*users.User, *errors.RestErr)
-	DeleteUser(int64) *errors.RestErr
-	SearchUser(string) (users.Users, *errors.RestErr)
-	LoginUser(users.UserLoginRequest) (*users.User, *errors.RestErr)
+	CreateUser(users.User) (*users.User, *resterrors.RestErr)
+	GetUser(int64) (*users.User, *resterrors.RestErr)
+	UpdateUser(bool, users.User) (*users.User, *resterrors.RestErr)
+	DeleteUser(int64) *resterrors.RestErr
+	SearchUser(string) (users.Users, *resterrors.RestErr)
+	LoginUser(users.UserLoginRequest) (*users.User, *resterrors.RestErr)
 }
 
 // CreateUser is a service to handle the user creation
-func (s *usersService) CreateUser(user users.User) (*users.User, *errors.RestErr) {
+func (s *usersService) CreateUser(user users.User) (*users.User, *resterrors.RestErr) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
@@ -40,9 +40,9 @@ func (s *usersService) CreateUser(user users.User) (*users.User, *errors.RestErr
 }
 
 // GetUser is a service to handle the user recover
-func (s *usersService) GetUser(userID int64) (*users.User, *errors.RestErr) {
+func (s *usersService) GetUser(userID int64) (*users.User, *resterrors.RestErr) {
 	if userID <= 0 {
-		return nil, errors.NewBadRequestError("User ID has to be greater than 0.")
+		return nil, resterrors.NewBadRequestError("User ID has to be greater than 0.")
 	}
 
 	result := &users.User{ID: userID}
@@ -54,7 +54,7 @@ func (s *usersService) GetUser(userID int64) (*users.User, *errors.RestErr) {
 }
 
 // UpdateUser is a service to handle the user updating
-func (s *usersService) UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestErr) {
+func (s *usersService) UpdateUser(isPartial bool, user users.User) (*users.User, *resterrors.RestErr) {
 	current, err := s.GetUser(user.ID)
 	if err != nil {
 		return nil, err
@@ -88,9 +88,9 @@ func (s *usersService) UpdateUser(isPartial bool, user users.User) (*users.User,
 }
 
 // DeleteUser is a service to handle the user recover
-func (s *usersService) DeleteUser(userID int64) *errors.RestErr {
+func (s *usersService) DeleteUser(userID int64) *resterrors.RestErr {
 	if userID <= 0 {
-		return errors.NewBadRequestError("User ID has to be greater than 0.")
+		return resterrors.NewBadRequestError("User ID has to be greater than 0.")
 	}
 
 	user := &users.User{ID: userID}
@@ -98,13 +98,13 @@ func (s *usersService) DeleteUser(userID int64) *errors.RestErr {
 }
 
 // SearchUser is a service to handle the user recover using params
-func (s *usersService) SearchUser(status string) (users.Users, *errors.RestErr) {
+func (s *usersService) SearchUser(status string) (users.Users, *resterrors.RestErr) {
 	dao := &users.User{}
 	return dao.FindByStatus(status)
 }
 
 // LoginUser is a service to handle the user login
-func (s *usersService) LoginUser(request users.UserLoginRequest) (*users.User, *errors.RestErr) {
+func (s *usersService) LoginUser(request users.UserLoginRequest) (*users.User, *resterrors.RestErr) {
 	dao := &users.User{
 		Email:    request.Email,
 		Password: cryptoutils.GetMd5(request.Password),

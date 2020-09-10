@@ -3,7 +3,7 @@ package users
 import (
 	"strings"
 
-	"github.com/migueloli/bookstore_users-api/utils/errors"
+	"github.com/migueloli/bookstore_utils-go/resterrors"
 )
 
 const (
@@ -27,18 +27,18 @@ type Users []User
 
 // Validate is used to verify if the user struct has the obligated fields
 // are correctly fulfilled
-func (user *User) Validate() *errors.RestErr {
+func (user *User) Validate() *resterrors.RestErr {
 	user.FirstName = strings.TrimSpace(strings.ToLower(user.FirstName))
 	user.LastName = strings.TrimSpace(strings.ToLower(user.LastName))
 
 	user.Email = strings.TrimSpace(strings.ToLower(user.Email))
 	if user.Email == "" {
-		return errors.NewBadRequestError("Invalid e-mail address.")
+		return resterrors.NewBadRequestError("Invalid e-mail address.")
 	}
 
 	user.Password = strings.TrimSpace(user.Email)
 	if user.Password == "" {
-		return errors.NewBadRequestError("Invalid password.")
+		return resterrors.NewBadRequestError("Invalid password.")
 	}
 
 	return nil
